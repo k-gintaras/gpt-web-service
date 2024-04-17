@@ -12,6 +12,7 @@ class GptService {
     return this.getFastGpt(msg, this.assistantFastAdvice);
   }
 
+  // no longer filters the code out... so might be ugly
   async getFastGptCode(msg: string): Promise<string> {
     return this.getFastGpt(msg, this.assistantFastCode);
   }
@@ -29,7 +30,7 @@ class GptService {
     await this.ensureThreadExists(assistantId);
     await this.sendMessageToThread(msg, assistantId);
     const runId = await this.createAndMonitorRun(assistantId);
-    const responseText = await this.retrieveAndFormatMessages(runId, assistantId);
+    const responseText = await this.retrieveMessages(runId, assistantId);
     return responseText;
   }
 
@@ -79,14 +80,36 @@ class GptService {
       throw new Error("No message found in the assistant's response.");
     }
 
-    const textContents = latestAssistantMessage.content.filter((contentItem): contentItem is OpenAI.Beta.Threads.Messages.MessageContent & { text: string } => 'text' in contentItem);
+    const textContents = latestAssistantMessage.content.filter((contentItem): contentItem is OpenAI.Beta.Threads.Messages.TextContentBlock => contentItem.type === 'text');
 
     if (textContents.length === 0) {
       throw new Error("No text content found in the assistant's response.");
     }
 
-    let responseText = textContents.map((content) => content.text).join('\n');
+    let responseText = textContents.map((content) => content.text.value).join('\n');
     responseText = this.formatGptResponse(responseText);
+
+    return responseText;
+  }
+
+  private async retrieveMessages(runId: string, assistantId: string): Promise<string> {
+    const thread = this.threads.get(assistantId);
+    const messages = await this.openai.beta.threads.messages.list(thread.id);
+    const assistantMessages = messages.data.filter((m) => m.role === 'assistant');
+    const latestAssistantMessage = assistantMessages.pop();
+
+    if (!latestAssistantMessage) {
+      throw new Error("No message found in the assistant's response.");
+    }
+
+    const textContents = latestAssistantMessage.content.filter((contentItem): contentItem is OpenAI.Beta.Threads.Messages.TextContentBlock => contentItem.type === 'text');
+
+    if (textContents.length === 0) {
+      throw new Error("No text content found in the assistant's response.");
+    }
+
+    let responseText = textContents.map((content) => content.text.value).join('\n');
+
     return responseText;
   }
 

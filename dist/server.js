@@ -14,11 +14,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
-const axios_1 = __importDefault(require("axios"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const gptApiAssistantRequest_1 = __importDefault(require("./gpt/gptApiAssistantRequest"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '';
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';
 app.use((0, cors_1.default)({
     origin: ALLOWED_ORIGIN,
     methods: ['POST'],
@@ -27,21 +27,16 @@ app.use((0, cors_1.default)({
 app.use(express_1.default.json());
 app.post('/gpt-request', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userInput } = req.body;
+    console.log('Received user input:', userInput);
     try {
-        const response = yield axios_1.default.post('https://api.openai.com/v1/engines/davinci/completions', {
-            prompt: userInput,
-            max_tokens: 100,
-            n: 1,
-            stop: null,
-            temperature: 0.7,
-        }, {
-            headers: {
-                Authorization: `Bearer ${process.env.GPT_API_KEY}`,
-                'Content-Type': 'application/json',
-            },
-        });
-        const generatedText = response.data.choices[0].text.trim();
-        res.json({ text: generatedText });
+        const gptKey = process.env.GPT_API_KEY;
+        if (!gptKey) {
+            throw new Error('GPT API key not found');
+        }
+        const gptService = new gptApiAssistantRequest_1.default(gptKey);
+        const response = yield gptService.getFastGptAdvice(userInput);
+        console.log('Generated response:', response);
+        res.json({ text: response });
     }
     catch (error) {
         console.error('Error:', error);
