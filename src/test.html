@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GPT Request Service Test</title>
+  </head>
+  <body>
+    <h1>GPT Request Service Test</h1>
+    <form id="gptForm">
+      <textarea id="userInput" rows="4" cols="50"></textarea><br />
+      <button type="submit">Submit</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+      document.getElementById('gptForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const userInput = document.getElementById('userInput').value;
+
+        try {
+          const response = await fetch('https://gpt-web-service.onrender.com/gpt-request', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userInput: userInput }),
+          });
+
+          if (!response.ok) {
+            throw new Error('Request failed');
+          }
+
+          const data = await response.json();
+          document.getElementById('result').innerText = data.text;
+        } catch (error) {
+          console.error('Error:', error);
+          document.getElementById('result').innerText = 'An error occurred';
+        }
+      });
+    </script>
+  </body>
+</html>

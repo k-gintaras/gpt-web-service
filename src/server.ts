@@ -1,13 +1,13 @@
 import express from 'express';
 import cors from 'cors';
-import axios from 'axios';
 import dotenv from 'dotenv';
+import GptService from './gpt/gptApiAssistantRequest';
 
 dotenv.config();
 
 const app = express();
 
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '';
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';
 
 app.use(
   cors({
@@ -21,27 +21,19 @@ app.use(express.json());
 
 app.post('/gpt-request', async (req, res) => {
   const { userInput } = req.body;
+  console.log('Received user input:', userInput);
 
   try {
-    const response = await axios.post(
-      'https://api.openai.com/v1/engines/davinci/completions',
-      {
-        prompt: userInput,
-        max_tokens: 100,
-        n: 1,
-        stop: null,
-        temperature: 0.7,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.GPT_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const gptKey = process.env.GPT_API_KEY;
+    if (!gptKey) {
+      throw new Error('GPT API key not found');
+    }
 
-    const generatedText = response.data.choices[0].text.trim();
-    res.json({ text: generatedText });
+    const gptService = new GptService(gptKey);
+    const response = await gptService.getFastGptAdvice(userInput);
+
+    console.log('Generated response:', response);
+    res.json({ text: response });
   } catch (error) {
     console.error('Error:', error);
     res.status(500).json({ error: 'An error occurred' });
