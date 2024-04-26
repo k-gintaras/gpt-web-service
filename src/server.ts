@@ -14,11 +14,25 @@ const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'https://taskorator.web.app
 
 app.use(
   cors({
-    origin: ALLOWED_ORIGIN,
-    methods: ['POST'],
-    allowedHeaders: ['Content-Type'],
+    origin: function (origin, callback) {
+      // Check if the origin is allowed
+      if (!origin || ALLOWED_ORIGIN) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    allowedHeaders: ['Content-Type', 'Authorization', 'user-id'], // Include 'user-id' in the allowed headers
   })
 );
+
+// app.use(
+//   cors({
+//     origin: ALLOWED_ORIGIN,
+//     methods: ['POST'],
+//     allowedHeaders: ['Content-Type'],
+//   })
+// );
 
 app.use(express.json());
 

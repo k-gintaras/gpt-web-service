@@ -24,10 +24,24 @@ exports.app = app;
 // const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'https://taskorator.web.app/';
 app.use((0, cors_1.default)({
-    origin: ALLOWED_ORIGIN,
-    methods: ['POST'],
-    allowedHeaders: ['Content-Type'],
+    origin: function (origin, callback) {
+        // Check if the origin is allowed
+        if (!origin || ALLOWED_ORIGIN) {
+            callback(null, true);
+        }
+        else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    allowedHeaders: ['Content-Type', 'Authorization', 'user-id'], // Include 'user-id' in the allowed headers
 }));
+// app.use(
+//   cors({
+//     origin: ALLOWED_ORIGIN,
+//     methods: ['POST'],
+//     allowedHeaders: ['Content-Type'],
+//   })
+// );
 app.use(express_1.default.json());
 // app.post('/gpt-request', async (req, res) => {
 //   const { userInput } = req.body;
