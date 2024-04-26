@@ -12,20 +12,41 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.app = void 0;
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const gptApiAssistantRequest_1 = __importDefault(require("./gpt/gptApiAssistantRequest"));
+const apiKeyAuthMiddleware_1 = require("./helpers/apiKeyAuthMiddleware");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';
+exports.app = app;
+// const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'https://taskorator.web.app/';
 app.use((0, cors_1.default)({
     origin: ALLOWED_ORIGIN,
     methods: ['POST'],
     allowedHeaders: ['Content-Type'],
 }));
 app.use(express_1.default.json());
-app.post('/gpt-request', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// app.post('/gpt-request', async (req, res) => {
+//   const { userInput } = req.body;
+//   console.log('Received user input:', userInput);
+//   try {
+//     const gptKey = process.env.GPT_API_KEY;
+//     if (!gptKey) {
+//       throw new Error('GPT API key not found');
+//     }
+//     const gptService = new GptService(gptKey);
+//     const response = await gptService.getFastGptAdvice(userInput);
+//     console.log('Generated response:', response);
+//     res.json({ text: response });
+//   } catch (error) {
+//     console.error('Error:', error);
+//     res.status(500).json({ error: 'An error occurred' });
+//   }
+// });
+app.post('/gpt-request', apiKeyAuthMiddleware_1.apiKeyAuthMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userInput } = req.body;
     console.log('Received user input:', userInput);
     try {
