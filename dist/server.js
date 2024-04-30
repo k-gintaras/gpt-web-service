@@ -69,7 +69,7 @@ app.post('/gpt-request', apiKeyAuthMiddleware_1.apiKeyAuthMiddleware, (req, res)
             throw new Error('GPT API key not found');
         }
         const gptService = new gptApiAssistantRequest_1.default(gptKey);
-        const response = yield gptService.getFastGptAdvice(userInput);
+        const response = yield gptService.getFastGptTaskAdvice(userInput);
         console.log('Generated response:', response);
         res.json({ text: response });
     }

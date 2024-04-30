@@ -7,8 +7,8 @@ async function testGptService() {
   }
   const gptService = new GptService(gptKey);
 
-  const userInput = 'Tell me a joke about cloud services.';
-  const response = await gptService.getFastGptAdvice(userInput);
+  const userInput = 'learning cloud services, advice me please';
+  const response = await gptService.getFastGptTaskAdvice(userInput);
 
   console.log('User input:', userInput);
   console.log('Generated response:', response);

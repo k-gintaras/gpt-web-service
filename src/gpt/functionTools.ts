@@ -1,4 +1,6 @@
-export const task_response_function_tool = {
+import OpenAI from 'openai';
+
+export const task_response_function_tool: OpenAI.Beta.AssistantTool = {
   type: 'function',
   function: {
     name: 'get_task_details',
