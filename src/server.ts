@@ -67,7 +67,7 @@ app.post('/gpt-request', apiKeyAuthMiddleware, async (req, res) => {
     }
 
     const gptService = new GptService(gptKey);
-    const response = await gptService.getFastGptAdvice(userInput);
+    const response = await gptService.getFastGptTaskAdvice(userInput);
 
     console.log('Generated response:', response);
     res.json({ text: response });

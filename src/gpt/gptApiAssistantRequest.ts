@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import { task_response_function_tool } from './functionTools';
 class GptService {
   private apiKey: string;
   private openai: OpenAI;
@@ -7,9 +8,14 @@ class GptService {
   // extract this for later use
   private assistantFastCode = 'asst_51x0kYdnXcdkjOE3S4VpzIPL';
   private assistantFastAdvice = 'asst_szH5sTEBIt7E7waEvS8GRNFO';
+  private assistantTaskAdvice = 'asst_I2HPDImsn9oGMEtt99ek3Kk5';
 
   async getFastGptAdvice(msg: string): Promise<string> {
     return this.getFastGpt(msg, this.assistantFastAdvice);
+  }
+
+  async getFastGptTaskAdvice(msg: string): Promise<string> {
+    return this.getFastGpt(msg, this.assistantTaskAdvice);
   }
 
   // no longer filters the code out... so might be ugly
