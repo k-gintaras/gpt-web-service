@@ -94,7 +94,17 @@ app.post('/gpt-request', apiKeyAuthMiddleware, async (req, res) => {
     res.status(500).json({ error: 'An error occurred' });
   }
 });
+app.get('/ping', async (req, res) => {
+  const { userInput } = req.body;
 
+  try {
+    
+    res.json({ text: "pong" });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
 // const port = process.env.PORT || 3000;
 const port = parseInt(process.env.PORT || '3000', 10);
 

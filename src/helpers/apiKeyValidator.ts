@@ -1,6 +1,8 @@
 // apiKeyValidator.js
 const admin = require('firebase-admin');
-const serviceAccount = require('/etc/secrets/firebase.json');
+const serviceAccount = require('../config/firebase.json');
+// const firebaseConfig = require('../config/firebase.json'); // Adjust path as needed
+
 
 // Initialize Firebase Admin SDK with service account credentials
 admin.initializeApp({
