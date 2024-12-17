@@ -10,19 +10,37 @@ dotenv.config();
 const app = express();
 
 // const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'https://taskorator.web.app/';
+// const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'https://taskorator.web.app/';
+
+// app.use(
+//   cors({
+//     origin: function (origin, callback) {
+//       // Check if the origin is allowed
+//       if (!origin || ALLOWED_ORIGIN) {
+//         callback(null, true);
+//       } else {
+//         callback(new Error('Not allowed by CORS'));
+//       }
+//     },
+//     allowedHeaders: ['Content-Type', 'Authorization', 'user-id'], // Include 'user-id' in the allowed headers
+//   })
+// );
+const ALLOWED_ORIGINS = [
+  process.env.ALLOWED_ORIGIN_WEB_APP || 'http://localhost:3000', // Firebase web app
+  process.env.ALLOWED_ORIGIN_LOCAL || 'http://localhost:3000', // Access from your laptop locally
+  process.env.ALLOWED_ORIGIN_IP || 'http://localhost:3000', // Replace this with your laptop's local IP
+];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Check if the origin is allowed
-      if (!origin || ALLOWED_ORIGIN) {
+      if (!origin || ALLOWED_ORIGINS.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
       }
     },
-    allowedHeaders: ['Content-Type', 'Authorization', 'user-id'], // Include 'user-id' in the allowed headers
+    allowedHeaders: ['Content-Type', 'Authorization', 'user-id'],
   })
 );
 
@@ -77,9 +95,15 @@ app.post('/gpt-request', apiKeyAuthMiddleware, async (req, res) => {
   }
 });
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+// const port = process.env.PORT || 3000;
+const port = parseInt(process.env.PORT || '3000', 10);
+
+// app.listen(port, () => {
+//   console.log(`Server is running on port ${port}`);
+// });
+
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Server is running on http://0.0.0.0:${port}`);
 });
 
 export { app };

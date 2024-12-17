@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  gpt-api:
+    build: .
+    container_name: gpt-api-container
+    ports:
+      - '3000:3000' # Map local port 3000 to container's 3000
+    environment:
+      - PORT=3000
+      - ALLOWED_ORIGIN=http://192.168.1.10:3000 # Adjust for your IP
+      - GPT_API_KEY=your_gpt_api_key_here
+    restart: always # Automatically restart if the app stops
